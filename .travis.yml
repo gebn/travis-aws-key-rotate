@@ -1,0 +1,47 @@
+sudo: false
+language: python
+cache: pip
+python:
+- 3.6
+script:
+- ./create_deployment_pkg
+deploy:
+- provider: lambda
+  function_name: travis-aws-key-rotate
+  description: Rotates AWS access keys used by Travis CI
+  region: eu-west-1
+  role: arn:aws:iam::158438328645:role/travis-aws-key-rotate-role
+  runtime: python3.6
+  module_name: lambda
+  handler_name: handler
+  zip: /dev/shm/deploy.zip
+  timeout: 10
+  memory_size: 128
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  on:
+    branch: latest
+- provider: lambda
+  function_name: travis-aws-key-rotate
+  description: Rotates AWS access keys used by Travis CI
+  region: eu-west-1
+  role: arn:aws:iam::158438328645:role/travis-aws-key-rotate-role
+  runtime: python3.6
+  module_name: lambda
+  handler_name: handler
+  zip: /dev/shm/deploy.zip
+  timeout: 10
+  memory_size: 128
+  access_key_id: $AWS_ACCESS_KEY_ID
+  secret_access_key: $AWS_SECRET_ACCESS_KEY
+  publish: true
+  on:
+    tags: true
+- provider: releases
+  file: "/dev/shm/deploy.zip"
+  skip_cleanup: true
+  api_key:
+    secure: lDW9PQggNM4bAI6zqdSSTCDqqrjAY8435TGG0lfghtatvBf5XBLaJ/4lOfKug52qVgK8BL6pLyK51Rg4G5lwj/WOZNKQ8Dz73ALRbt/nUYGUov7C36KkJaGu6hYGO0yvH6LwIbwKPiEhlGeWFcNjv1kW5aQiYLOXkKwQ3aJHB+R2Md8etPXj9ZNv7UksMeSHU8lDc6HOcGLZmf426pjR+lgIKYrMLYfd145V6U83s0jd1lrCVkob31MIRv7C+OwSzLF5iUliL2zewa30t4CswT+RDRwkH/SJqz/Hnt7yQhcm5iIe68fvzW42UTR3mQqxJ4fjzUU7x/5BvBrVavX0Dp77w3htoJV3tnmidElyfGF7HNs6stcrLFqprkd5UCThEHe4d48l3SP6cQo4ZC9/dU/Kv9/uEs9vuDhUadAQrBx5741H1NJ4nAKsdALW+D8+YIuykLOTTroVmOMNeWWJwo2sAUgrdIysIw4EhDYPupWKkmdsV6UBPTWSCFAOLVhwTwWzltzu8iMr/UR3ds89ebE1svWcCUA4evsnvje5ez2hS/JVnTCNYbcpsJbA13a0qFPsKg9U13ReoW9Uzqf9LvYH/ECv5r38VeW4NqCG7iDRPpSimCEaFRbBnQO9tVVbnHZjvsQPSYvfjvZ9z3/YH93MMlzewH6stX1qOFUww1s=
+  on:
+    repo: gebn/travis-aws-key-rotate
+    tags: true
